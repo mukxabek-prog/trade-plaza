@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Trade Plaza - Live</title>
+    <style>
+        body { margin: 0; background-color: #050505; color: #00ff00; font-family: 'Courier New', monospace; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* HEADER */
+        .header { background: #111; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ff00; height: 60px; }
+        .search-bar { width: 40%; padding: 8px; border-radius: 5px; border: 1px solid #00ff00; background: #000; color: #00ff00; outline: none; }
+
+        /* ASOSIY QISM */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* MARKETPLACE */
+        .container { flex: 3; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; overflow-y: auto; border-right: 1px solid #333; }
+        .item-card { background: #111; border-radius: 10px; padding: 12px; border: 1px solid #333; position: relative; transition: 0.3s; }
+        .item-card:hover { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+        .item-img { width: 100%; height: 150px; border-radius: 5px; object-fit: cover; border: 1px solid #00ff00; }
+        .user-gmail { font-size: 11px; color: gold; cursor: pointer; text-decoration: underline; margin-top: 5px; display: block; }
+        
+        /* O'CHIRISH TUGMASI */
+        .delete-btn { position: absolute; top: 5px; right: 5px; background: #ff4d4d; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 2px 8px; font-weight: bold; z-index: 10; }
+
+        /* CHAT SECTION */
+        .chat-section { flex: 1; display: flex; flex-direction: column; background: #080808; min-width: 300px; border-left: 1px solid #333; }
+        .chat-tabs { display: flex; background: #151515; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; color: #555; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { color: #00ff00; border-bottom: 2px solid #00ff00; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 13px; word-wrap: break-word; }
+        .msg.sent { background: #00ff00; color: black; align-self: flex-end; }
+        .msg.received { background: #222; color: white; align-self: flex-start; }
+
+        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #333; }
+        .chat-input { flex: 1; background: #000; border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; outline: none; }
+        .send-btn { background: #00ff00; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* MODAL */
+        .add-btn { position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px; background: #00ff00; color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; cursor: pointer; border: none; box-shadow: 0 0 20px #00ff00; z-index: 100; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 200; }
+        .modal-content { background: #000; padding: 25px; border-radius: 10px; width: 320px; border: 2px solid #00ff00; }
+        .modal-content input, .modal-content textarea { width: 92%; padding: 10px; margin: 8px 0; background: #111; border: 1px solid #00ff00; color: #00ff00; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0; font-size: 18px;">SIGMA PLAZA</h2>
+        <input type="text" class="search-bar" id="search-input" placeholder="Breinrot qidirish..." onkeyup="filterItems()">
+        <button onclick="location.href='index.html'" style="background:#ff4d4d; border:none; color:white; padding:8px 15px; border-radius:5px; cursor:pointer;">Exit</button>
+    </div>
+
+    <div class="main-layout">
+        <div class="container" id="items-container">
+            </div>
+
+        <div class="chat-section">
+            <div class="chat-tabs">
+                <button class="tab-btn active" id="global-tab" onclick="switchChat('global')">Global Chat</button>
+                <button class="tab-btn" id="trade-tab" onclick="switchChat('trade')">Trade Chat</button>
+            </div>
+            <div id="chat-window" class="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-msg-input" class="chat-input" placeholder="Xabar yozing...">
+                <button class="send-btn" onclick="sendMessage()">></button>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-btn" onclick="toggleModal(true)">+</button>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <h2 style="color:#00ff00; margin-top:0; font-size:20px;">Yangi Post</h2>
+            <input type="text" id="item-name" placeholder="Nomi (masalan: Skibidi)">
+            <input type="email" id="item-gmail" placeholder="Gmaillingiz">
+            <input type="file" id="item-file" accept="image/*">
+            <textarea id="item-bio" placeholder="Tavsif (Bio)" rows="3"></textarea>
+            <button style="width:100%; padding:12px; background:#00ff00; border:none; font-weight:bold; cursor:pointer;" onclick="addItem()">POST QILISH</button>
+            <p onclick="toggleModal(false)" style="text-align:center; cursor:pointer; margin-top:15px; color:#ff4d4d; font-size:14px;">Bekor qilish</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3jCi4nnM8t40Q9Jz5myqLbHERwuhjAc",
+            authDomain: "planning-with-ai-59d4a.firebaseapp.com",
+            projectId: "planning-with-ai-59d4a",
+            storageBucket: "planning-with-ai-59d4a.firebasestorage.app",
+            messagingSenderId: "531314715302",
+            appId: "1:531314715302:web:2d14a6c278478c67e32267"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const postsCol = collection(db, "posts");
+
+        // BAZADAN O'QISH
+        onSnapshot(query(postsCol, orderBy("timestamp", "desc")), (snapshot) => {
+            const container = document.getElementById('items-container');
+            container.innerHTML = "";
+            snapshot.forEach((postDoc) => {
+                const data = postDoc.data();
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deletePost('${postDoc.id}')">X</button>
+                    <img src="${data.img}" class="item-img">
+                    <div class="item-info">
+                        <h3>${data.name}</h3>
+                        <p>${data.bio}</p>
+                        <span class="user-gmail" onclick="openPrivateChat('${data.gmail}')">${data.gmail}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+
+        // POST QO'SHISH
+        window.addItem = async function() {
+            const name = document.getElementById('item-name').value;
+            const gmail = document.getElementById('item-gmail').value;
+            const bio = document.getElementById('item-bio').value;
+            const file = document.getElementById('item-file').files[0];
+
+            if(name && gmail && file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    await addDoc(postsCol, {
+                        name: name,
+                        gmail: gmail,
+                        bio: bio,
+                        img: e.target.result,
+                        timestamp: Date.now()
+                    });
+                    toggleModal(false);
+                    document.getElementById('item-name').value = "";
+                    document.getElementById('item-gmail').value = "";
+                    document.getElementById('item-bio').value = "";
+                };
+                reader.readAsDataURL(file);
+            } else { alert("Ma'lumotlarni to'ldiring!"); }
+        };
+
+        // O'CHIRISH
+        window.deletePost = async function(id) {
+            if(confirm("Ushbu breinrotni o'chirmoqchimisiz?")) {
+                await deleteDoc(doc(db, "posts", id));
+            }
+        };
+    </script>
+
+    <script>
+        function toggleModal(show) { document.getElementById('add-modal').style.display = show ? 'flex' : 'none'; }
+
+        function filterItems() {
+            let input = document.getElementById('search-input').value.toLowerCase();
+            let cards = document.getElementsByClassName('item-card');
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].querySelector('h3').innerText.toLowerCase();
+                cards[i].style.display = title.includes(input) ? "block" : "none";
+            }
+        }
+
+        let currentChat = 'global';
+        function switchChat(type) {
+            currentChat = type;
+            document.getElementById('global-tab').classList.toggle('active', type === 'global');
+            document.getElementById('trade-tab').classList.toggle('active', type === 'trade');
+            document.getElementById('chat-window').innerHTML = `<div class="msg received">${type === 'global' ? 'Global chat: Hamma shu yerda.' : 'Lichka: Gmail egasi bilan bog\'landingiz.'}</div>`;
+        }
+
+        function openPrivateChat(gmail) {
+            switchChat('trade');
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.innerHTML += `<div class="msg received">Siz <b>${gmail}</b> bilan bog'landingiz. Savdolashishni boshlang!</div>`;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-msg-input');
+            const chatWindow = document.getElementById('chat-window');
+            if(input.value.trim() !== "") {
+                const msg = document.createElement('div');
+                msg.className = 'msg sent';
+                msg.innerText = input.value;
+                chatWindow.appendChild(msg);
+                input.value = "";
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
