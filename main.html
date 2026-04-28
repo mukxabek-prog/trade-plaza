@@ -5,109 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sigma Plaza - Final Fix</title>
     <style>
-        :root { --neon: #0f0; --bg: #000; }
-        body { background: var(--bg); color: var(--neon); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root { --neon: #00ff00; --bg: #000; --card: #0a0a0a; }
+        body { margin: 0; background: var(--bg); color: var(--neon); font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
         /* SIDEBAR */
-        .sidebar { width: 70px; border-right: 2px solid var(--neon); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 30px; background: #050505; }
-        .nav-btn { cursor: pointer; text-align: center; font-size: 11px; color: var(--neon); opacity: 0.7; transition: 0.3s; }
-        .nav-btn:hover { opacity: 1; text-shadow: 0 0 8px var(--neon); }
+        .sidebar { width: 90px; background: #050505; border-right: 1px solid var(--neon); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
+        .nav-item { cursor: pointer; text-align: center; opacity: 0.6; transition: 0.3s; font-size: 10px; color: var(--neon); }
+        .nav-item.active { opacity: 1; text-shadow: 0 0 10px var(--neon); font-weight: bold; }
+        .nav-item span { font-size: 28px; display: block; margin-bottom: 5px; }
 
-        /* MAIN AREA */
-        .main { flex: 1; display: flex; flex-direction: column; }
-        .header { padding: 15px 25px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; align-items: center; background: #000; }
-        .content { flex: 1; overflow-y: auto; padding: 20px; }
-        .section { display: none; }
+        /* MAIN CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .header { height: 60px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; background: #000; }
+        .section { display: none; flex: 1; overflow-y: auto; padding: 25px; }
         .section.active { display: block; }
 
-        /* CARDS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .card { border: 1px solid var(--neon); background: #0a0a0a; border-radius: 8px; overflow: hidden; position: relative; transition: 0.3s; }
-        .card:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,255,0,0.2); }
-        .card img { width: 100%; height: 160px; object-fit: cover; border-bottom: 1px solid #111; }
-        .card-info { padding: 10px; text-align: center; font-weight: bold; }
+        /* GRID & CARDS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid #222; border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; }
+        .card:hover { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,0,0.2); }
+        .card img { width: 100%; height: 160px; object-fit: cover; border-bottom: 1px solid #222; }
+        .card-body { padding: 12px; font-size: 14px; text-align: center; }
+        .del-btn { position: absolute; top: 8px; right: 8px; background: red; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-weight: bold; z-index: 10; }
 
-        /* CHAT SYSTEM */
-        .chat-container { height: 75vh; display: flex; flex-direction: column; border: 1px solid var(--neon); border-radius: 10px; background: #050505; }
-        .msgs-box { flex: 1; overflow-y: auto; padding: 15px; color: #fff; }
-        .input-area { display: flex; border-top: 1px solid var(--neon); padding: 10px; gap: 10px; }
-        .input-area input { flex: 1; background: transparent; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; outline: none; }
-        .input-area input:focus { border-color: var(--neon); }
-        .input-area button { background: var(--neon); border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        /* CHAT */
+        .chat-wrap { height: 85%; border: 1px solid var(--neon); display: flex; flex-direction: column; background: #050505; border-radius: 10px; }
+        .msgs-box { flex: 1; overflow-y: auto; padding: 15px; color: #fff; font-size: 14px; line-height: 1.5; }
+        .chat-in-wrap { display: flex; border-top: 1px solid var(--neon); }
+        .chat-in-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 15px; outline: none; }
+        .chat-in-wrap button { background: var(--neon); border: none; padding: 0 25px; cursor: pointer; font-weight: bold; color: #000; }
 
-        /* UI ELEMENTS */
-        .login-btn { background: var(--neon); color: #000; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--neon); border: none; font-size: 30px; cursor: pointer; box-shadow: 0 0 20px var(--neon); z-index: 999; }
-        .del-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; }
-
-        /* MODAL */
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:1000; }
-        .modal-content { background:#000; border:2px solid var(--neon); padding:30px; border-radius:15px; width:320px; }
+        /* MODAL & PLUS */
+        .btn-add { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--neon); border: none; border-radius: 50%; font-size: 35px; cursor: pointer; box-shadow: 0 0 20px var(--neon); z-index: 100; color: #000; }
+        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="nav-btn" onclick="showSection('wiki')">🏠<br>WIKI</div>
-        <div class="nav-btn" onclick="showSection('global')">💬<br>CHAT</div>
-        <div class="nav-btn" onclick="showSection('admin')">👑<br>ADMIN</div>
+        <div class="nav-item active" onclick="nav('wiki', this)"><span>📚</span>Wiki</div>
+        <div class="nav-item" onclick="nav('global', this)"><span>💬</span>Global</div>
+        <div class="nav-item" onclick="nav('shop', this)"><span>🛒</span>Shop</div>
+        <div class="nav-item" onclick="nav('admin', this)"><span>👑</span>Admin</div>
     </div>
 
-    <div class="main">
+    <div class="main-content">
         <div class="header">
-            <span style="font-size: 22px; font-weight: bold; letter-spacing: 2px;">SIGMA PLAZA</span>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div id="u-name" style="font-size: 13px;">Tizimga kiring -></div>
-                <button id="login-trigger" class="login-btn" onclick="startLogin()">KIRISH</button>
+            <h2 id="page-title" style="margin:0; font-size:18px;">BRAINROTLAR (WIKI)</h2>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span id="user-name" style="font-size:12px; color:#fff;">...</span>
+                <img id="user-img" src="" style="width:32px; border-radius:50%; border:1px solid var(--neon);">
             </div>
         </div>
 
-        <div class="content">
-            <div id="wiki" class="section active">
-                <div id="wiki-list" class="grid"></div>
-            </div>
-
-            <div id="global" class="section">
-                <div class="chat-container">
-                    <div id="g-msgs" class="msgs-box"></div>
-                    <div class="input-area">
-                        <input type="text" id="g-input" placeholder="Xabar yozing...">
-                        <button onclick="sendGlobal()">YUBORISH</button>
-                    </div>
+        <div id="wiki" class="section active"><div id="wiki-grid" class="grid"></div></div>
+        
+        <div id="global" class="section">
+            <div class="chat-wrap">
+                <div id="g-msgs" class="msgs-box"></div>
+                <div class="chat-in-wrap">
+                    <input type="text" id="g-input" placeholder="Xabar yozing...">
+                    <button onclick="sendGlobal()">></button>
                 </div>
             </div>
+        </div>
 
-            <div id="admin" class="section">
-                <div class="chat-container">
-                    <div id="a-msgs" class="msgs-box"></div>
-                    <div class="input-area">
-                        <input type="text" id="a-input" placeholder="Adminga savol yoki murojaat...">
-                        <button onclick="sendAdmin()">YUBORISH</button>
-                    </div>
+        <div id="shop" class="section"><div id="shop-grid" class="grid"></div></div>
+
+        <div id="admin" class="section">
+            <div class="chat-wrap">
+                <div id="a-msgs" class="msgs-box"></div>
+                <div class="chat-in-wrap">
+                    <input type="text" id="a-input" placeholder="Adminga savol yoki trade yordami...">
+                    <button onclick="sendAdmin()">></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <button class="add-btn" onclick="toggleModal(true)">+</button>
+    <button class="btn-add" onclick="document.getElementById('modal').style.display='flex'">+</button>
 
     <div id="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--neon)">Yangi Post</h3>
-            <input type="text" id="p-name" placeholder="Post nomi (masalan: Supra)" style="width:100%; padding:10px; margin-bottom:15px; background:#111; border:1px solid #333; color:#fff;">
-            <label style="font-size:12px; display:block; margin-bottom:5px;">Rasm tanlang:</label>
-            <input type="file" id="p-file" accept="image/*" style="width:100%; margin-bottom:20px; color:#fff;">
-            <button onclick="uploadPost()" id="up-btn" style="width:100%; background:var(--neon); border:none; padding:12px; font-weight:bold; cursor:pointer;">YUKLASH</button>
-            <button onclick="toggleModal(false)" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Bekor qilish</button>
+        <div style="background:#000; border:2px solid var(--neon); padding:25px; width:300px; border-radius:15px; box-shadow:0 0 30px var(--neon);">
+            <h3 style="margin-top:0;">Yangi Post</h3>
+            <input type="text" id="p-name" placeholder="Nomi" style="width:100%; margin-bottom:12px; background:#111; color:#fff; border:1px solid #333; padding:10px; box-sizing:border-box;">
+            <select id="p-type" style="width:100%; margin-bottom:12px; background:#111; color:var(--neon); padding:10px; border:1px solid #333;">
+                <option value="wiki">WIKI (Ma'lumot)</option>
+                <option value="shop">SHOP (Sotuvda)</option>
+            </select>
+            <input type="file" id="p-file" style="width:100%; margin-bottom:15px; color:#fff;">
+            <button onclick="savePost()" id="save-btn" style="width:100%; background:var(--neon); border:none; padding:12px; font-weight:bold; cursor:pointer; color:#000;">YUKLASH</button>
+            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Yopish</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyAOfHOeEY_z5_UIZ3iX37-ghsn3GPCCcaw",
             authDomain: "roblox-trade-plaza.firebaseapp.com",
             projectId: "roblox-trade-plaza",
@@ -116,141 +113,113 @@
             appId: "1:357233560307:web:f7b972214189aa04278586"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(config);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
-        let currentUser = null;
+        let user = null;
 
-        // AUTH CONTROL
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('u-name').innerText = user.displayName;
-                document.getElementById('login-trigger').style.display = 'none';
-                listenAdminChat();
+        // AUTH
+        onAuthStateChanged(auth, (u) => {
+            if (u) {
+                user = u;
+                document.getElementById('user-name').innerText = u.displayName;
+                document.getElementById('user-img').src = u.photoURL;
+                listenAdmin();
             } else {
-                currentUser = null;
-                document.getElementById('u-name').innerText = "Tizimga kiring ->";
-                document.getElementById('login-trigger').style.display = 'block';
+                signInWithPopup(auth, provider);
             }
         });
 
-        window.startLogin = () => {
-            signInWithPopup(auth, provider).catch(err => {
-                alert("Oyna ochilmadi! Iltimos, brauzer sozlamalaridan Pop-upga ruxsat bering.");
-            });
-        };
-
-        window.showSection = (id) => {
+        window.nav = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            document.getElementById('page-title').innerText = id === 'wiki' ? 'BRAINROTLAR (WIKI)' : id.toUpperCase();
         };
 
-        window.toggleModal = (show) => {
-            document.getElementById('modal').style.display = show ? 'flex' : 'none';
+        // CHAT FUNCTIONS
+        window.sendGlobal = async () => {
+            const txt = document.getElementById('g-input').value;
+            if(!txt || !user) return;
+            await addDoc(collection(db, "global_chat"), { name: user.displayName, text: txt, time: serverTimestamp() });
+            document.getElementById('g-input').value = "";
         };
 
-        // POSTS LOGIC
-        window.uploadPost = async () => {
-            if(!currentUser) return alert("Avval tizimga kiring!");
+        onSnapshot(query(collection(db, "global_chat"), orderBy("time", "asc")), (s) => {
+            const b = document.getElementById('g-msgs'); b.innerHTML = "";
+            s.forEach(d => b.innerHTML += `<div><b style="color:var(--neon)">${d.data().name}:</b> ${d.data().text}</div>`);
+            b.scrollTop = b.scrollHeight;
+        });
+
+        window.sendAdmin = async () => {
+            const txt = document.getElementById('a-input').value;
+            if(!txt || !user) return;
+            await addDoc(collection(db, "admin_chats", user.email, "msgs"), { name: user.displayName, text: txt, time: serverTimestamp() });
+            document.getElementById('a-input').value = "";
+        };
+
+        function listenAdmin() {
+            onSnapshot(query(collection(db, "admin_chats", user.email, "msgs"), orderBy("time", "asc")), (s) => {
+                const b = document.getElementById('a-msgs'); b.innerHTML = "";
+                s.forEach(d => b.innerHTML += `<div><b style="color:var(--neon)">${d.data().name}:</b> ${d.data().text}</div>`);
+                b.scrollTop = b.scrollHeight;
+            });
+        }
+
+        // POST FUNCTIONS
+        window.savePost = async () => {
             const name = document.getElementById('p-name').value;
+            const type = document.getElementById('p-type').value;
             const file = document.getElementById('p-file').files[0];
-            const btn = document.getElementById('up-btn');
+            const btn = document.getElementById('save-btn');
 
-            if(!name || !file) return alert("Ma'lumotlarni to'ldiring!");
-            
-            btn.innerText = "YUKLANMOQDA...";
-            btn.disabled = true;
+            if(!name || !file) return alert("Hamma joyni to'ldiring!");
+            btn.innerText = "YUKLANMOQDA..."; btn.disabled = true;
 
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
-                    await addDoc(collection(db, "posts"), {
+                    await addDoc(collection(db, "all_posts"), {
                         name: name,
+                        type: type,
                         img: e.target.result,
-                        owner: currentUser.email,
+                        owner: user.email,
                         time: serverTimestamp()
                     });
-                    toggleModal(false);
+                    document.getElementById('modal').style.display = 'none';
                     document.getElementById('p-name').value = "";
-                } catch (err) {
-                    alert("Xato yuz berdi: " + err.message);
-                }
-                btn.innerText = "YUKLASH";
-                btn.disabled = false;
+                } catch(err) { alert("Xato: " + err.message); }
+                btn.innerText = "YUKLASH"; btn.disabled = false;
             };
             reader.readAsDataURL(file);
         };
 
-        // Real-time Posts
-        onSnapshot(query(collection(db, "posts"), orderBy("time", "desc")), (snap) => {
-            const list = document.getElementById('wiki-list');
-            list.innerHTML = "";
-            snap.forEach(d => {
+        onSnapshot(query(collection(db, "all_posts"), orderBy("time", "desc")), (s) => {
+            const wGrid = document.getElementById('wiki-grid');
+            const sGrid = document.getElementById('shop-grid');
+            wGrid.innerHTML = ""; sGrid.innerHTML = "";
+
+            s.forEach(d => {
                 const p = d.data();
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    ${(currentUser && p.owner === currentUser.email) ? `<button class="del-btn" onclick="deletePost('${d.id}')">X</button>` : ''}
+                    ${(user && p.owner === user.email) ? `<button class="del-btn" onclick="deleteMyPost('${d.id}')">X</button>` : ''}
                     <img src="${p.img}">
-                    <div class="card-info">${p.name}</div>
+                    <div class="card-body"><b>${p.name}</b></div>
                 `;
-                list.appendChild(card);
+                if(p.type === 'wiki') wGrid.appendChild(card);
+                else sGrid.appendChild(card);
             });
         });
 
-        window.deletePost = async (id) => {
-            if(confirm("Haqiqatan ham o'chirmoqchimisiz?")) {
-                await deleteDoc(doc(db, "posts", id));
+        window.deleteMyPost = async (id) => {
+            if(confirm("Haqiqatdan ham o'chirmoqchimisiz?")) {
+                await deleteDoc(doc(db, "all_posts", id));
             }
         };
-
-        // GLOBAL CHAT LOGIC
-        window.sendGlobal = async () => {
-            const txt = document.getElementById('g-input').value;
-            if(!txt || !currentUser) return;
-            await addDoc(collection(db, "global_chat"), {
-                name: currentUser.displayName,
-                text: txt,
-                time: serverTimestamp()
-            });
-            document.getElementById('g-input').value = "";
-        };
-
-        onSnapshot(query(collection(db, "global_chat"), orderBy("time", "asc")), (snap) => {
-            const box = document.getElementById('g-msgs');
-            box.innerHTML = "";
-            snap.forEach(d => {
-                const m = d.data();
-                box.innerHTML += `<div><b style="color:var(--neon)">${m.name}:</b> ${m.text}</div>`;
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-
-        // ADMIN CHAT LOGIC
-        window.sendAdmin = async () => {
-            const txt = document.getElementById('a-input').value;
-            if(!txt || !currentUser) return;
-            await addDoc(collection(db, "admin_messages", currentUser.email, "msgs"), {
-                name: currentUser.displayName,
-                text: txt,
-                time: serverTimestamp()
-            });
-            document.getElementById('a-input').value = "";
-        };
-
-        function listenAdminChat() {
-            onSnapshot(query(collection(db, "admin_messages", currentUser.email, "msgs"), orderBy("time", "asc")), (snap) => {
-                const box = document.getElementById('a-msgs');
-                box.innerHTML = "";
-                snap.forEach(d => {
-                    const m = d.data();
-                    box.innerHTML += `<div><b style="color:var(--neon)">${m.name}:</b> ${m.text}</div>`;
-                });
-                box.scrollTop = box.scrollHeight;
-            });
-        }
     </script>
 </body>
 </html>
