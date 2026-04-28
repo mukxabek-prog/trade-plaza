@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma Plaza - Final Fix</title>
+    <title>Sigma Plaza - Final Version</title>
     <style>
         :root { --neon: #00ff00; --bg: #000; --card: #0a0a0a; }
         body { margin: 0; background: var(--bg); color: var(--neon); font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
@@ -14,87 +14,115 @@
         .nav-item.active { opacity: 1; text-shadow: 0 0 10px var(--neon); font-weight: bold; }
         .nav-item span { font-size: 28px; display: block; margin-bottom: 5px; }
 
-        /* MAIN CONTENT */
-        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .header { height: 60px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; background: #000; }
-        .section { display: none; flex: 1; overflow-y: auto; padding: 25px; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .header { height: 70px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; background: #000; }
+        .section { display: none; flex: 1; overflow-y: auto; padding: 20px; }
         .section.active { display: block; }
 
+        /* SEARCH & POST AREA */
+        .tools-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-in { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; outline: none; }
+        .search-in:focus { border-color: var(--neon); }
+        .btn-plus { background: var(--neon); color: #000; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
         /* GRID & CARDS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border: 1px solid #222; border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; }
-        .card:hover { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,0,0.2); }
-        .card img { width: 100%; height: 160px; object-fit: cover; border-bottom: 1px solid #222; }
-        .card-body { padding: 12px; font-size: 14px; text-align: center; }
-        .del-btn { position: absolute; top: 8px; right: 8px; background: red; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-weight: bold; z-index: 10; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid #222; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; }
+        .card img { width: 100%; height: 140px; object-fit: cover; }
+        .card-body { padding: 10px; text-align: center; font-size: 14px; }
+        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; z-index: 5; }
 
-        /* CHAT */
-        .chat-wrap { height: 85%; border: 1px solid var(--neon); display: flex; flex-direction: column; background: #050505; border-radius: 10px; }
-        .msgs-box { flex: 1; overflow-y: auto; padding: 15px; color: #fff; font-size: 14px; line-height: 1.5; }
-        .chat-in-wrap { display: flex; border-top: 1px solid var(--neon); }
-        .chat-in-wrap input { flex: 1; background: transparent; border: none; color: #fff; padding: 15px; outline: none; }
-        .chat-in-wrap button { background: var(--neon); border: none; padding: 0 25px; cursor: pointer; font-weight: bold; color: #000; }
+        /* CHAT SYSTEM */
+        .msgs-box { flex: 1; overflow-y: auto; padding: 15px; color: #fff; font-size: 14px; }
+        .chat-in { display: flex; border-top: 1px solid var(--neon); }
+        .chat-in input { flex: 1; background: transparent; border: none; color: #fff; padding: 15px; outline: none; }
+        .chat-in button { background: var(--neon); border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
 
-        /* MODAL & PLUS */
-        .btn-add { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--neon); border: none; border-radius: 50%; font-size: 35px; cursor: pointer; box-shadow: 0 0 20px var(--neon); z-index: 100; color: #000; }
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; }
+        /* PRIVATE CHAT OVERLAY */
+        .chat-overlay { position: fixed; bottom: 20px; right: 20px; width: 320px; height: 450px; background: #000; border: 2px solid var(--neon); border-radius: 10px; display: none; flex-direction: column; z-index: 3000; box-shadow: 0 0 20px rgba(0,255,0,0.3); }
+        .chat-head { background: #111; padding: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--neon); font-size: 14px; }
+
+        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:4000; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="nav-item active" onclick="nav('wiki', this)"><span>📚</span>Wiki</div>
+        <div class="nav-item active" onclick="nav('wiki', this)"><span>🏠</span>Asosiy</div>
         <div class="nav-item" onclick="nav('global', this)"><span>💬</span>Global</div>
-        <div class="nav-item" onclick="nav('shop', this)"><span>🛒</span>Shop</div>
+        <div class="nav-item" onclick="nav('friends', this)"><span>👥</span>Friends</div>
         <div class="nav-item" onclick="nav('admin', this)"><span>👑</span>Admin</div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h2 id="page-title" style="margin:0; font-size:18px;">BRAINROTLAR (WIKI)</h2>
+            <h2 id="page-title" style="margin:0; font-size:18px;">ASOSIY WIKI</h2>
             <div style="display:flex; align-items:center; gap:12px;">
                 <span id="user-name" style="font-size:12px; color:#fff;">...</span>
-                <img id="user-img" src="" style="width:32px; border-radius:50%; border:1px solid var(--neon);">
+                <img id="user-img" src="" style="width:32px; height:32px; border-radius:50%; border:1px solid var(--neon);">
             </div>
         </div>
 
-        <div id="wiki" class="section active"><div id="wiki-grid" class="grid"></div></div>
-        
+        <div id="wiki" class="section active">
+            <div class="tools-bar">
+                <input type="text" id="wiki-search" class="search-in" placeholder="Postlarni qidirish..." oninput="filterWiki()">
+                <button class="btn-plus" onclick="document.getElementById('modal').style.display='flex'">+ POST QO'YISH</button>
+            </div>
+            <div id="wiki-grid" class="grid"></div>
+        </div>
+
+        <div id="friends" class="section">
+            <div class="tools-bar">
+                <input type="text" id="friend-search" class="search-in" placeholder="Do'stlarni qidirish..." oninput="filterFriends()">
+            </div>
+            <div id="friends-grid" class="grid"></div>
+        </div>
+
         <div id="global" class="section">
-            <div class="chat-wrap">
+            <div style="height:90%; display:flex; flex-direction:column; border:1px solid var(--neon); border-radius:10px;">
                 <div id="g-msgs" class="msgs-box"></div>
-                <div class="chat-in-wrap">
-                    <input type="text" id="g-input" placeholder="Xabar yozing...">
+                <div class="chat-in">
+                    <input type="text" id="g-input" placeholder="Hamma ko'radigan xabar...">
                     <button onclick="sendGlobal()">></button>
                 </div>
             </div>
         </div>
 
-        <div id="shop" class="section"><div id="shop-grid" class="grid"></div></div>
-
         <div id="admin" class="section">
-            <div class="chat-wrap">
-                <div id="a-msgs" class="msgs-box"></div>
-                <div class="chat-in-wrap">
-                    <input type="text" id="a-input" placeholder="Adminga savol yoki trade yordami...">
-                    <button onclick="sendAdmin()">></button>
+            <div style="display: flex; height: 90%; gap: 15px;">
+                <div id="admin-user-list" style="width: 220px; border: 1px solid var(--neon); border-radius: 10px; overflow-y: auto; padding: 10px; background: #050505;">
+                    <div id="user-tabs"></div>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; border: 1px solid var(--neon); border-radius: 10px;">
+                    <div id="a-chat-head" style="padding: 10px; background: #111; border-bottom: 1px solid #222;">Suhbat: <span id="current-chat-user" style="color:var(--neon)">Admin</span></div>
+                    <div id="a-msgs" class="msgs-box"></div>
+                    <div class="chat-in">
+                        <input type="text" id="a-input" placeholder="Adminga yozing...">
+                        <button onclick="sendAdminMsg()">></button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <button class="btn-add" onclick="document.getElementById('modal').style.display='flex'">+</button>
+    <div id="p-chat" class="chat-overlay">
+        <div class="chat-head">
+            <span id="p-chat-name">Chat</span>
+            <span onclick="document.getElementById('p-chat').style.display='none'" style="cursor:pointer; color:red;">[X]</span>
+        </div>
+        <div id="p-msgs" class="msgs-box"></div>
+        <div class="chat-in">
+            <input type="text" id="p-input" placeholder="Xabar...">
+            <button onclick="sendPriv()">></button>
+        </div>
+    </div>
 
     <div id="modal">
-        <div style="background:#000; border:2px solid var(--neon); padding:25px; width:300px; border-radius:15px; box-shadow:0 0 30px var(--neon);">
-            <h3 style="margin-top:0;">Yangi Post</h3>
-            <input type="text" id="p-name" placeholder="Nomi" style="width:100%; margin-bottom:12px; background:#111; color:#fff; border:1px solid #333; padding:10px; box-sizing:border-box;">
-            <select id="p-type" style="width:100%; margin-bottom:12px; background:#111; color:var(--neon); padding:10px; border:1px solid #333;">
-                <option value="wiki">WIKI (Ma'lumot)</option>
-                <option value="shop">SHOP (Sotuvda)</option>
-            </select>
-            <input type="file" id="p-file" style="width:100%; margin-bottom:15px; color:#fff;">
-            <button onclick="savePost()" id="save-btn" style="width:100%; background:var(--neon); border:none; padding:12px; font-weight:bold; cursor:pointer; color:#000;">YUKLASH</button>
+        <div style="background:#000; border:2px solid var(--neon); padding:25px; width:320px; border-radius:15px;">
+            <h3 style="margin-bottom:15px;">Yangi Post</h3>
+            <input type="text" id="p-name" placeholder="Nomi" style="width:100%; margin-bottom:12px; background:#111; color:#fff; border:1px solid #333; padding:12px; box-sizing:border-box;">
+            <input type="file" id="p-file" style="width:100%; margin-bottom:20px; color:#fff;">
+            <button onclick="savePost()" id="save-btn" style="width:100%; background:var(--neon); border:none; padding:15px; font-weight:bold; cursor:pointer;">YUKLASH</button>
             <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Yopish</button>
         </div>
     </div>
@@ -102,7 +130,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const config = {
             apiKey: "AIzaSyAOfHOeEY_z5_UIZ3iX37-ghsn3GPCCcaw",
@@ -113,18 +141,23 @@
             appId: "1:357233560307:web:f7b972214189aa04278586"
         };
 
+        const ADMIN_EMAIL = "mukxabek@gmail.com"; 
+
         const app = initializeApp(config);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
         let user = null;
+        let activePrivChat = null;
+        let selectedAdminChatUser = null;
 
-        // AUTH
-        onAuthStateChanged(auth, (u) => {
+        onAuthStateChanged(auth, async (u) => {
             if (u) {
                 user = u;
                 document.getElementById('user-name').innerText = u.displayName;
                 document.getElementById('user-img').src = u.photoURL;
+                await setDoc(doc(db, "users", u.email), { name: u.displayName, img: u.photoURL, email: u.email });
+                loadFriends();
                 listenAdmin();
             } else {
                 signInWithPopup(auth, provider);
@@ -136,14 +169,83 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            document.getElementById('page-title').innerText = id === 'wiki' ? 'BRAINROTLAR (WIKI)' : id.toUpperCase();
         };
 
-        // CHAT FUNCTIONS
+        let wikiPosts = [];
+        onSnapshot(query(collection(db, "all_posts"), orderBy("time", "desc")), (s) => {
+            wikiPosts = []; s.forEach(d => wikiPosts.push({id: d.id, ...d.data()}));
+            renderWiki(wikiPosts);
+        });
+
+        function renderWiki(data) {
+            const grid = document.getElementById('wiki-grid'); grid.innerHTML = "";
+            data.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `${(user && p.owner === user.email) ? `<button class="del-btn" onclick="event.stopPropagation(); deletePost('${p.id}')">X</button>` : ''}<img src="${p.img}"><div class="card-body"><b>${p.name}</b></div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        window.filterWiki = () => {
+            const q = document.getElementById('wiki-search').value.toLowerCase();
+            renderWiki(wikiPosts.filter(p => p.name.toLowerCase().includes(q)));
+        };
+
+        window.deletePost = async (id) => { if(confirm("O'chirilsinmi?")) await deleteDoc(doc(db, "all_posts", id)); };
+
+        let allUsers = [];
+        function loadFriends() {
+            onSnapshot(collection(db, "users"), (s) => {
+                allUsers = []; s.forEach(d => { if(d.id !== user.email) allUsers.push(d.data()); });
+                renderFriends(allUsers);
+            });
+        }
+
+        function renderFriends(data) {
+            const grid = document.getElementById('friends-grid'); grid.innerHTML = "";
+            data.forEach(u => {
+                const div = document.createElement('div'); div.className = 'card';
+                div.onclick = () => openPriv(u);
+                div.innerHTML = `<img src="${u.img}"><div class="card-body"><b>${u.name}</b></div>`;
+                grid.appendChild(div);
+            });
+        }
+
+        window.filterFriends = () => {
+            const q = document.getElementById('friend-search').value.toLowerCase();
+            renderFriends(allUsers.filter(u => u.name.toLowerCase().includes(q)));
+        };
+
+        let privUnsub = null;
+        window.openPriv = (target) => {
+            activePrivChat = target;
+            document.getElementById('p-chat-name').innerText = target.name;
+            document.getElementById('p-chat').style.display = 'flex';
+            if(privUnsub) privUnsub();
+            const chatId = [user.email, target.email].sort().join("_");
+            privUnsub = onSnapshot(query(collection(db, "messages", chatId, "list"), orderBy("time", "asc")), (s) => {
+                const b = document.getElementById('p-msgs'); b.innerHTML = "";
+                s.forEach(d => {
+                    const m = d.data();
+                    b.innerHTML += `<div><b style="color:${m.sender===user.email?'var(--neon)':'#fff'}">${m.name}:</b> ${m.text}</div>`;
+                });
+                b.scrollTop = b.scrollHeight;
+            });
+        };
+
+        window.sendPriv = async () => {
+            const t = document.getElementById('p-input').value;
+            if(!t) return;
+            const chatId = [user.email, activePrivChat.email].sort().join("_");
+            await addDoc(collection(db, "messages", chatId, "list"), { sender: user.email, name: user.displayName, text: t, time: serverTimestamp() });
+            document.getElementById('p-input').value = "";
+        };
+
         window.sendGlobal = async () => {
-            const txt = document.getElementById('g-input').value;
-            if(!txt || !user) return;
-            await addDoc(collection(db, "global_chat"), { name: user.displayName, text: txt, time: serverTimestamp() });
+            const t = document.getElementById('g-input').value;
+            if(!t) return;
+            await addDoc(collection(db, "global_chat"), { name: user.displayName, text: t, time: serverTimestamp() });
             document.getElementById('g-input').value = "";
         };
 
@@ -153,72 +255,60 @@
             b.scrollTop = b.scrollHeight;
         });
 
-        window.sendAdmin = async () => {
-            const txt = document.getElementById('a-input').value;
-            if(!txt || !user) return;
-            await addDoc(collection(db, "admin_chats", user.email, "msgs"), { name: user.displayName, text: txt, time: serverTimestamp() });
+        window.sendAdminMsg = async () => {
+            const t = document.getElementById('a-input').value;
+            if(!t) return;
+            const path = (user.email === ADMIN_EMAIL) ? selectedAdminChatUser : user.email;
+            if(!path) return alert("Suhbatdoshni tanlang!");
+            await addDoc(collection(db, "admin_messages", path, "list"), { sender: user.email, name: user.displayName, text: t, time: serverTimestamp() });
             document.getElementById('a-input').value = "";
         };
 
+        let adminSub = null;
         function listenAdmin() {
-            onSnapshot(query(collection(db, "admin_chats", user.email, "msgs"), orderBy("time", "asc")), (s) => {
+            if(user.email === ADMIN_EMAIL) {
+                onSnapshot(collection(db, "admin_messages"), (s) => {
+                    const list = document.getElementById('user-tabs'); list.innerHTML = "";
+                    s.forEach(d => {
+                        const div = document.createElement('div');
+                        div.style = "padding:10px; background:#111; margin-bottom:5px; border-radius:5px; cursor:pointer;";
+                        div.innerText = d.id.split('@')[0];
+                        div.onclick = () => { selectedAdminChatUser = d.id; document.getElementById('current-chat-user').innerText = d.id; loadAdminChat(d.id); };
+                        list.appendChild(div);
+                    });
+                });
+            } else {
+                document.getElementById('admin-user-list').style.display = 'none';
+                loadAdminChat(user.email);
+            }
+        }
+
+        function loadAdminChat(path) {
+            if(adminSub) adminSub();
+            adminSub = onSnapshot(query(collection(db, "admin_messages", path, "list"), orderBy("time", "asc")), (s) => {
                 const b = document.getElementById('a-msgs'); b.innerHTML = "";
-                s.forEach(d => b.innerHTML += `<div><b style="color:var(--neon)">${d.data().name}:</b> ${d.data().text}</div>`);
+                s.forEach(d => {
+                    const m = d.data();
+                    const c = m.sender === ADMIN_EMAIL ? 'red' : 'var(--neon)';
+                    b.innerHTML += `<div><b style="color:${c}">${m.name}:</b> ${m.text}</div>`;
+                });
                 b.scrollTop = b.scrollHeight;
             });
         }
 
-        // POST FUNCTIONS
         window.savePost = async () => {
-            const name = document.getElementById('p-name').value;
-            const type = document.getElementById('p-type').value;
-            const file = document.getElementById('p-file').files[0];
+            const n = document.getElementById('p-name').value;
+            const f = document.getElementById('p-file').files[0];
             const btn = document.getElementById('save-btn');
-
-            if(!name || !file) return alert("Hamma joyni to'ldiring!");
-            btn.innerText = "YUKLANMOQDA..."; btn.disabled = true;
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    await addDoc(collection(db, "all_posts"), {
-                        name: name,
-                        type: type,
-                        img: e.target.result,
-                        owner: user.email,
-                        time: serverTimestamp()
-                    });
-                    document.getElementById('modal').style.display = 'none';
-                    document.getElementById('p-name').value = "";
-                } catch(err) { alert("Xato: " + err.message); }
-                btn.innerText = "YUKLASH"; btn.disabled = false;
+            if(!n || !f) return alert("To'ldiring!");
+            btn.disabled = true; btn.innerText = "YUKLANMOQDA...";
+            const r = new FileReader();
+            r.onload = async (e) => {
+                await addDoc(collection(db, "all_posts"), { name: n, img: e.target.result, owner: user.email, time: serverTimestamp() });
+                document.getElementById('modal').style.display = 'none';
+                btn.disabled = false; btn.innerText = "YUKLASH";
             };
-            reader.readAsDataURL(file);
-        };
-
-        onSnapshot(query(collection(db, "all_posts"), orderBy("time", "desc")), (s) => {
-            const wGrid = document.getElementById('wiki-grid');
-            const sGrid = document.getElementById('shop-grid');
-            wGrid.innerHTML = ""; sGrid.innerHTML = "";
-
-            s.forEach(d => {
-                const p = d.data();
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    ${(user && p.owner === user.email) ? `<button class="del-btn" onclick="deleteMyPost('${d.id}')">X</button>` : ''}
-                    <img src="${p.img}">
-                    <div class="card-body"><b>${p.name}</b></div>
-                `;
-                if(p.type === 'wiki') wGrid.appendChild(card);
-                else sGrid.appendChild(card);
-            });
-        });
-
-        window.deleteMyPost = async (id) => {
-            if(confirm("Haqiqatdan ham o'chirmoqchimisiz?")) {
-                await deleteDoc(doc(db, "all_posts", id));
-            }
+            r.readAsDataURL(f);
         };
     </script>
 </body>
