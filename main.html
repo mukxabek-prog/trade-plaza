@@ -3,91 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma Plaza - Fixed Edition</title>
+    <title>Sigma Plaza - Final Version</title>
     <style>
-        :root { --neon: #00ff00; --bg: #050505; --card: #0f0f0f; --glass: rgba(0, 255, 0, 0.05); }
-        body { margin: 0; background: var(--bg); color: var(--neon); font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        :root { --neon: #00ff00; --bg: #000; --card: #0a0a0a; }
+        body { margin: 0; background: var(--bg); color: var(--neon); font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
-        /* SIDEBAR */
-        .sidebar { width: 90px; background: #000; border-right: 1px solid var(--neon); display: flex; flex-direction: column; align-items: center; padding-top: 25px; gap: 30px; }
-        .nav-item { cursor: pointer; text-align: center; opacity: 0.6; transition: 0.3s; }
+        .sidebar { width: 90px; background: #050505; border-right: 1px solid var(--neon); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
+        .nav-item { cursor: pointer; text-align: center; opacity: 0.6; transition: 0.3s; font-size: 10px; }
         .nav-item.active { opacity: 1; text-shadow: 0 0 10px var(--neon); }
-        .nav-label { font-size: 10px; text-transform: uppercase; margin-top: 5px; }
+        .nav-item span { font-size: 24px; display: block; }
 
-        /* CONTENT */
         .main-content { flex: 1; display: flex; flex-direction: column; }
-        .header { height: 70px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
-        .section { display: none; flex: 1; overflow-y: auto; padding: 30px; }
+        .header { height: 60px; border-bottom: 1px solid var(--neon); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .section { display: none; flex: 1; overflow-y: auto; padding: 20px; }
         .section.active { display: block; }
 
-        /* CARDS & DELETE BUTTON */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .card { background: var(--card); border: 1px solid #222; border-radius: 15px; overflow: hidden; position: relative; }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-txt { padding: 15px; }
-        .del-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 12px; z-index: 10; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid #222; border-radius: 12px; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-body { padding: 10px; }
+        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 3px 8px; font-size: 10px; }
 
-        /* CHAT */
-        .chat-container { height: 75vh; background: var(--card); border: 1px solid var(--neon); border-radius: 10px; display: flex; flex-direction: column; }
-        .msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; color: #fff; }
-        .chat-bar { display: flex; border-top: 1px solid var(--neon); }
-        .chat-bar input { flex: 1; background: transparent; border: none; color: #fff; padding: 15px; outline: none; }
-        .chat-bar button { background: var(--neon); border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
-        
-        #u-img { width: 35px; border-radius: 50%; border: 1px solid var(--neon); }
-        .btn-plus { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--neon); border: none; border-radius: 50%; font-size: 30px; cursor: pointer; }
+        .chat-area { height: 80%; border: 1px solid var(--neon); display: flex; flex-direction: column; background: #050505; border-radius: 8px; }
+        .msgs { flex: 1; overflow-y: auto; padding: 15px; color: #fff; font-size: 14px; }
+        .chat-input { display: flex; border-top: 1px solid var(--neon); }
+        .chat-input input { flex: 1; background: transparent; border: none; color: #fff; padding: 12px; outline: none; }
+        .chat-input button { background: var(--neon); border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
+
+        #u-img { width: 30px; border-radius: 50%; border: 1px solid var(--neon); }
+        .btn-add { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background: var(--neon); border: none; border-radius: 50%; font-size: 30px; cursor: pointer; box-shadow: 0 0 15px var(--neon); }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="nav-item active" onclick="nav('brainrots', this)"><span>🏠</span><div class="nav-label">Wiki</div></div>
-        <div class="nav-item" onclick="nav('chat', this)"><span>💬</span><div class="nav-label">Global</div></div>
-        <div class="nav-item" onclick="nav('admin', this)"><span>👑</span><div class="nav-label">Admin</div></div>
+        <div class="nav-item active" onclick="nav('wiki', this)"><span>🏠</span>Wiki</div>
+        <div class="nav-item" onclick="nav('global', this)"><span>💬</span>Global</div>
+        <div class="nav-item" onclick="nav('shop', this)"><span>🛒</span>Shop</div>
+        <div class="nav-item" onclick="nav('admin', this)"><span>👑</span>Admin</div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h2 id="title">BRAINROTLAR</h2>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="u-name">...</span>
+            <h3 id="t-label">BRAINROTLAR</h3>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span id="u-name" style="font-size:12px;">...</span>
                 <img id="u-img" src="">
             </div>
         </div>
 
-        <div id="brainrots" class="section active">
-            <div id="p-grid" class="grid"></div>
+        <div id="wiki" class="section active"><div id="wiki-grid" class="grid"></div></div>
+        <div id="global" class="section">
+            <div class="chat-area"><div id="g-msgs" class="msgs"></div>
+            <div class="chat-input"><input type="text" id="g-in" placeholder="Xabar..."><button onclick="sendG()">></button></div></div>
         </div>
-
-        <div id="chat" class="section">
-            <div class="chat-container">
-                <div id="g-msgs" class="msgs"></div>
-                <div class="chat-bar">
-                    <input type="text" id="g-in" placeholder="Global xabar...">
-                    <button onclick="sendG()">YUBORISH</button>
-                </div>
-            </div>
-        </div>
-
+        <div id="shop" class="section"><div id="shop-grid" class="grid"></div></div>
         <div id="admin" class="section">
-            <div class="chat-container">
-                <div id="a-msgs" class="msgs"></div>
-                <div class="chat-bar">
-                    <input type="text" id="a-in" placeholder="Adminga xabar...">
-                    <button onclick="sendA()">YUBORISH</button>
-                </div>
-            </div>
+            <div class="chat-area"><div id="a-msgs" class="msgs"></div>
+            <div class="chat-input"><input type="text" id="a-in" placeholder="Adminga yozing..."><button onclick="sendA()">></button></div></div>
         </div>
     </div>
 
-    <button class="btn-plus" onclick="document.getElementById('modal').style.display='flex'">+</button>
+    <button class="btn-add" onclick="document.getElementById('modal').style.display='flex'">+</button>
 
-    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#000; border:1px solid var(--neon); padding:20px; width:300px; border-radius:10px;">
-            <input type="text" id="post-name" placeholder="Nomi" style="width:100%; margin-bottom:10px;">
-            <input type="file" id="post-file" style="width:100%; margin-bottom:10px;">
-            <button onclick="savePost()" style="width:100%; background:var(--neon); padding:10px;">YUKLASH</button>
-            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:10px; background:red;">YOPISH</button>
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#000; border:1px solid var(--neon); padding:25px; width:280px; border-radius:15px;">
+            <input type="text" id="p-name" placeholder="Nomi" style="width:100%; margin-bottom:10px; background:#111; color:#fff; border:1px solid #333; padding:10px;">
+            <select id="p-type" style="width:100%; margin-bottom:10px; background:#111; color:#0f0; padding:10px; border:1px solid #333;">
+                <option value="wiki">Wiki (Brainrot)</option>
+                <option value="shop">Shop (Savdo)</option>
+            </select>
+            <input type="file" id="p-file" style="width:100%; margin-bottom:10px; color:#fff;">
+            <button onclick="savePost()" style="width:100%; background:var(--neon); border:none; padding:12px; font-weight:bold; cursor:pointer;">POST QILISH</button>
+            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Bekor qilish</button>
         </div>
     </div>
 
@@ -112,94 +100,72 @@
         let user = null;
 
         onAuthStateChanged(auth, (u) => {
-            if (u) {
-                user = u;
-                document.getElementById('u-name').innerText = u.displayName;
-                document.getElementById('u-img').src = u.photoURL;
-                loadAdminChat();
-            } else {
-                signInWithPopup(auth, provider);
-            }
+            if (u) { user = u; document.getElementById('u-name').innerText = u.displayName; document.getElementById('u-img').src = u.photoURL; loadAdmin(); }
+            else { signInWithPopup(auth, provider); }
         });
 
         window.nav = (id, el) => {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
+            document.getElementById('t-label').innerText = id.toUpperCase();
         };
 
-        // GLOBAL CHAT FUNKSIYASI
+        // CHAT FUNCTIONS
         window.sendG = async () => {
             const val = document.getElementById('g-in').value;
-            if(val && user) {
-                await addDoc(collection(db, "global"), { name: user.displayName, text: val, time: serverTimestamp() });
-                document.getElementById('g-in').value = "";
-            }
+            if(val && user) { await addDoc(collection(db, "global"), { name: user.displayName, text: val, time: serverTimestamp() }); document.getElementById('g-in').value = ""; }
         };
-
         onSnapshot(query(collection(db, "global"), orderBy("time", "asc")), (s) => {
-            const b = document.getElementById('g-msgs');
-            b.innerHTML = "";
-            s.forEach(d => b.innerHTML += `<div><b>${d.data().name}:</b> ${d.data().text}</div>`);
+            const b = document.getElementById('g-msgs'); b.innerHTML = "";
+            s.forEach(d => b.innerHTML += `<div><b style="color:var(--neon)">${d.data().name}:</b> ${d.data().text}</div>`);
             b.scrollTop = b.scrollHeight;
         });
 
-        // ADMIN CHAT FUNKSIYASI
         window.sendA = async () => {
             const val = document.getElementById('a-in').value;
-            if(val && user) {
-                await addDoc(collection(db, "chats", user.email, "messages"), { name: user.displayName, text: val, time: serverTimestamp() });
-                document.getElementById('a-in').value = "";
-            }
+            if(val && user) { await addDoc(collection(db, "chats", user.email, "messages"), { name: user.displayName, text: val, time: serverTimestamp() }); document.getElementById('a-in').value = ""; }
         };
-
-        function loadAdminChat() {
+        function loadAdmin() {
             onSnapshot(query(collection(db, "chats", user.email, "messages"), orderBy("time", "asc")), (s) => {
-                const b = document.getElementById('a-msgs');
-                b.innerHTML = "";
-                s.forEach(d => b.innerHTML += `<div><b>${d.data().name}:</b> ${d.data().text}</div>`);
+                const b = document.getElementById('a-msgs'); b.innerHTML = "";
+                s.forEach(d => b.innerHTML += `<div><b style="color:var(--neon)">${d.data().name}:</b> ${d.data().text}</div>`);
                 b.scrollTop = b.scrollHeight;
             });
         }
 
-        // POST YUKLASH
+        // POST FUNCTIONS
         window.savePost = async () => {
-            const name = document.getElementById('post-name').value;
-            const file = document.getElementById('post-file').files[0];
-            if(!name || !file) return;
+            const name = document.getElementById('p-name').value;
+            const type = document.getElementById('p-type').value;
+            const file = document.getElementById('p-file').files[0];
+            if(!name || !file) return alert("Ma'lumotlarni to'ldiring!");
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                await addDoc(collection(db, "posts"), { name, img: e.target.result, email: user.email, time: serverTimestamp() });
+                await addDoc(collection(db, "posts"), { name, type, img: e.target.result, owner: user.email, time: serverTimestamp() });
                 document.getElementById('modal').style.display='none';
             };
             reader.readAsDataURL(file);
         };
 
-        // POSTLARNI CHIQARISH VA O'CHIRISH
         onSnapshot(query(collection(db, "posts"), orderBy("time", "desc")), (s) => {
-            const g = document.getElementById('p-grid');
-            g.innerHTML = "";
+            const wGrid = document.getElementById('wiki-grid');
+            const sGrid = document.getElementById('shop-grid');
+            wGrid.innerHTML = ""; sGrid.innerHTML = "";
             s.forEach(d => {
-                const data = d.data();
-                // O'chirish tugmasi faqat post egasiga ko'rinadi
-                const delBtn = (user && data.email === user.email) ? `<button class="del-btn" onclick="deleteP('${d.id}')">O'chirish</button>` : "";
-                
-                g.innerHTML += `
+                const p = d.data();
+                const html = `
                     <div class="card">
-                        ${delBtn}
-                        <img src="${data.img}">
-                        <div class="card-txt"><h4>${data.name}</h4></div>
+                        ${(user && p.owner === user.email) ? `<button class="del-btn" onclick="window.delP('${d.id}')">X</button>` : ''}
+                        <img src="${p.img}"><div class="card-body"><b>${p.name}</b></div>
                     </div>`;
+                if(p.type === 'wiki') wGrid.innerHTML += html; else sGrid.innerHTML += html;
             });
         });
 
-        window.deleteP = async (id) => {
-            if(confirm("Postni o'chirasizmi?")) {
-                await deleteDoc(doc(db, "posts", id));
-            }
-        };
+        window.delP = async (id) => { if(confirm("O'chirilsinmi?")) await deleteDoc(doc(db, "posts", id)); };
     </script>
 </body>
 </html>
