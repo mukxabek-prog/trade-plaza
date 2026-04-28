@@ -6,21 +6,23 @@
     <title>Sigma Plaza - Live</title>
     <style>
         body { margin: 0; background: #000; color: #0f0; font-family: monospace; }
-        .header { padding: 20px; border-bottom: 1px solid #0f0; display: flex; justify-content: space-between; }
-        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-        .card { border: 1px solid #0f0; padding: 10px; border-radius: 10px; background: #050505; }
-        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
-        .add-btn { position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px; background: #0f0; border-radius: 50%; font-size: 30px; cursor: pointer; border: none; }
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 10; }
-        .modal-content { background: #000; border: 2px solid #0f0; padding: 20px; width: 300px; border-radius: 15px; }
-        input, textarea { width: 100%; margin: 10px 0; background: #111; border: 1px solid #0f0; color: #0f0; padding: 10px; box-sizing: border-box; }
+        .header { padding: 20px; border-bottom: 2px solid #0f0; display: flex; justify-content: space-between; align-items: center; }
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+        .card { border: 1px solid #0f0; padding: 15px; border-radius: 10px; background: #050505; transition: 0.3s; }
+        .card:hover { box-shadow: 0 0 15px #0f0; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
+        .add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #0f0; border: none; border-radius: 50%; font-size: 40px; cursor: pointer; color: #000; font-weight: bold; z-index: 100; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #000; border: 2px solid #0f0; padding: 25px; width: 320px; border-radius: 15px; }
+        input, textarea { width: 100%; margin: 10px 0; background: #111; border: 1px solid #0f0; color: #0f0; padding: 12px; box-sizing: border-box; border-radius: 5px; }
+        button#post-btn { width: 100%; background: #0f0; padding: 12px; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>SIGMA PLAZA</h1>
-        <button onclick="location.href='index.html'" style="background:red; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Exit</button>
+        <h1 style="margin:0;">SIGMA PLAZA</h1>
+        <button onclick="location.href='index.html'" style="background:red; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Chiqish</button>
     </div>
 
     <div id="posts-container" class="container"></div>
@@ -29,12 +31,12 @@
 
     <div id="modal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#0f0">Yangi Post</h2>
-            <input type="text" id="name" placeholder="Nomi">
+            <h2 style="color:#0f0; margin-top:0;">Yangi E'lon</h2>
+            <input type="text" id="name" placeholder="Buyum nomi (masalan: Brainrot)">
             <input type="file" id="file" accept="image/*">
-            <textarea id="bio" placeholder="Tavsif"></textarea>
-            <button id="post-btn" style="width:100%; background:#0f0; padding:10px; font-weight:bold; cursor:pointer;">POST QILISH</button>
-            <p onclick="document.getElementById('modal').style.display='none'" style="text-align:center; color:red; cursor:pointer;">Bekor qilish</p>
+            <textarea id="bio" placeholder="Tavsif yoki narxi..."></textarea>
+            <button id="post-btn">POST QILISH</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">Bekor qilish</p>
         </div>
     </div>
 
@@ -42,24 +44,28 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // SIZNING MAXSUS FIREBASE MA'LUMOTLARINGIZ
+        // SENING FIREBASE KONFIGURATSIYANG
         const firebaseConfig = {
+            apiKey: "AIzaSyAOfHOeEY_z5_UIZ3iX37-ghsn3GPCCcaw",
+            authDomain: "roblox-trade-plaza.firebaseapp.com",
             projectId: "roblox-trade-plaza",
-            storageBucket: "roblox-trade-plaza.appspot.com",
-            appId: "1:273821035782:web:2f0367283920" // Bu taxminiy, agar xato bersa srazu ayting
+            storageBucket: "roblox-trade-plaza.firebasestorage.app",
+            messagingSenderId: "357233560307",
+            appId: "1:357233560307:web:f7b972214189aa04278586"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const colRef = collection(db, "posts");
 
+        // Post qo'shish funksiyasi
         document.getElementById('post-btn').addEventListener('click', async () => {
             const name = document.getElementById('name').value;
             const bio = document.getElementById('bio').value;
             const file = document.getElementById('file').files[0];
             const btn = document.getElementById('post-btn');
 
-            if(!name || !file) return alert("Nom va rasm kiriting!");
+            if(!name || !file) return alert("Iltimos, nom va rasm tanlang!");
 
             btn.innerText = "YUKLANMOQDA...";
             btn.disabled = true;
@@ -74,18 +80,22 @@
                         createdAt: Date.now()
                     });
                     document.getElementById('modal').style.display = 'none';
+                    document.getElementById('name').value = "";
+                    document.getElementById('bio').value = "";
                     btn.innerText = "POST QILISH";
                     btn.disabled = false;
                 } catch (err) {
-                    alert("Xato: " + err.message);
-                    btn.disabled = false;
+                    alert("Xato yuz berdi: " + err.message);
                     btn.innerText = "POST QILISH";
+                    btn.disabled = false;
                 }
             };
             reader.readAsDataURL(file);
         });
 
-        onSnapshot(query(colRef, orderBy("createdAt", "desc")), (snap) => {
+        // Ma'lumotlarni real-vaqtda chiqarish
+        const q = query(colRef, orderBy("createdAt", "desc"));
+        onSnapshot(q, (snap) => {
             const cont = document.getElementById('posts-container');
             cont.innerHTML = "";
             snap.forEach(doc => {
@@ -93,8 +103,8 @@
                 cont.innerHTML += `
                     <div class="card">
                         <img src="${d.img}">
-                        <h3>${d.name}</h3>
-                        <p>${d.bio}</p>
+                        <h3 style="margin:5px 0;">${d.name}</h3>
+                        <p style="font-size:12px; color:#aaa;">${d.bio}</p>
                     </div>`;
             });
         });
