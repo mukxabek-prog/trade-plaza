@@ -3,48 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma Plaza - Live</title>
+    <title>Sigma Plaza - Private Chat System</title>
     <style>
-        body { margin: 0; background: #000; color: #0f0; font-family: monospace; }
-        .header { padding: 20px; border-bottom: 2px solid #0f0; display: flex; justify-content: space-between; align-items: center; }
-        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
-        .card { border: 1px solid #0f0; padding: 15px; border-radius: 10px; background: #050505; transition: 0.3s; }
-        .card:hover { box-shadow: 0 0 15px #0f0; }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
-        .add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #0f0; border: none; border-radius: 50%; font-size: 40px; cursor: pointer; color: #000; font-weight: bold; z-index: 100; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #000; border: 2px solid #0f0; padding: 25px; width: 320px; border-radius: 15px; }
-        input, textarea { width: 100%; margin: 10px 0; background: #111; border: 1px solid #0f0; color: #0f0; padding: 12px; box-sizing: border-box; border-radius: 5px; }
-        button#post-btn { width: 100%; background: #0f0; padding: 12px; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; }
+        :root { --main: #0f0; --bg: #000; --card: #0a0a0a; }
+        body { margin: 0; background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Global Chat */
+        .sidebar { width: 280px; border-right: 2px solid var(--main); display: flex; flex-direction: column; background: #050505; }
+        .chat-header { padding: 15px; border-bottom: 1px solid var(--main); text-align: center; font-size: 14px; font-weight: bold; }
+        #global-messages { flex: 1; overflow-y: auto; padding: 10px; font-size: 12px; }
+        .input-box { display: flex; border-top: 1px solid var(--main); padding: 5px; }
+        .input-box input { flex: 1; background: #000; border: none; color: var(--main); padding: 8px; outline: none; }
+
+        /* Main Area */
+        .main-layout { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .header { padding: 10px 20px; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; }
+        .search-bar { background: #000; border: 1px solid var(--main); color: var(--main); padding: 5px 15px; border-radius: 5px; width: 250px; }
+        
+        .container { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
+        
+        /* Item Card */
+        .card { border: 1px solid #333; border-radius: 10px; background: var(--card); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .card:hover { border-color: var(--main); }
+        .card img { width: 100%; height: 150px; object-fit: cover; }
+        .card-info { padding: 10px; flex: 1; }
+        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; cursor: pointer; padding: 2px 7px; border-radius: 3px; font-size: 10px; }
+
+        /* Mini Chat inside Card */
+        .item-chat { height: 120px; border-top: 1px solid #222; background: #050505; display: flex; flex-direction: column; }
+        .msg-list { flex: 1; overflow-y: auto; padding: 5px; font-size: 11px; color: #aaa; }
+        .msg-input { border-top: 1px solid #222; display: flex; }
+        .msg-input input { flex: 1; background: transparent; border: none; color: var(--main); padding: 5px; font-size: 11px; outline: none; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #000; border: 2px solid var(--main); padding: 20px; width: 300px; border-radius: 10px; }
+        .add-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--main); border-radius: 50%; border: none; font-size: 30px; cursor: pointer; color: black; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 style="margin:0;">SIGMA PLAZA</h1>
-        <button onclick="location.href='index.html'" style="background:red; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Chiqish</button>
+    <div class="sidebar">
+        <div class="chat-header">GLOBAL CHAT</div>
+        <div id="global-messages"></div>
+        <div class="input-box">
+            <input type="text" id="g-input" placeholder="Xabar...">
+            <button id="g-send" style="background:var(--main); border:none; cursor:pointer; padding: 5px 10px;">></button>
+        </div>
     </div>
 
-    <div id="posts-container" class="container"></div>
+    <div class="main-layout">
+        <div class="header">
+            <h3>SIGMA PLAZA</h3>
+            <input type="text" id="search" class="search-bar" placeholder="Qidirish...">
+            <button onclick="location.href='index.html'" style="background:red; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:5px;">Chiqish</button>
+        </div>
+        <div id="container" class="container"></div>
+    </div>
 
     <button class="add-btn" onclick="document.getElementById('modal').style.display='flex'">+</button>
 
     <div id="modal" class="modal">
         <div class="modal-content">
-            <h2 style="color:#0f0; margin-top:0;">Yangi E'lon</h2>
-            <input type="text" id="name" placeholder="Buyum nomi (masalan: Brainrot)">
-            <input type="file" id="file" accept="image/*">
-            <textarea id="bio" placeholder="Tavsif yoki narxi..."></textarea>
-            <button id="post-btn">POST QILISH</button>
-            <p onclick="document.getElementById('modal').style.display='none'" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">Bekor qilish</p>
+            <h3 style="margin-top:0">Yangi Post</h3>
+            <input type="text" id="p-name" placeholder="Buyum nomi" style="width:100%; margin-bottom:10px;">
+            <input type="file" id="p-file" accept="image/*" style="width:100%; margin-bottom:10px;">
+            <textarea id="p-desc" placeholder="Tavsif (narxi va h.k.)" style="width:100%; height:60px; margin-bottom:10px; background:#111; color:#0f0; border:1px solid #0f0;"></textarea>
+            <button id="p-save" style="width:100%; padding:10px; background:var(--main); border:none; font-weight:bold; cursor:pointer;">POST QILISH</button>
+            <p onclick="document.getElementById('modal').style.display='none'" style="text-align:center; color:red; cursor:pointer; margin-top:10px;">Yopish</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // SENING FIREBASE KONFIGURATSIYANG
         const firebaseConfig = {
             apiKey: "AIzaSyAOfHOeEY_z5_UIZ3iX37-ghsn3GPCCcaw",
             authDomain: "roblox-trade-plaza.firebaseapp.com",
@@ -56,58 +89,87 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const colRef = collection(db, "posts");
 
-        // Post qo'shish funksiyasi
-        document.getElementById('post-btn').addEventListener('click', async () => {
-            const name = document.getElementById('name').value;
-            const bio = document.getElementById('bio').value;
-            const file = document.getElementById('file').files[0];
-            const btn = document.getElementById('post-btn');
+        // --- GLOBAL CHAT ---
+        const gChatRef = collection(db, "global_chat");
+        document.getElementById('g-send').onclick = async () => {
+            const txt = document.getElementById('g-input').value;
+            if(txt) {
+                await addDoc(gChatRef, { text: txt, time: serverTimestamp() });
+                document.getElementById('g-input').value = "";
+            }
+        };
+        onSnapshot(query(gChatRef, orderBy("time", "asc")), (snap) => {
+            const box = document.getElementById('global-messages');
+            box.innerHTML = "";
+            snap.forEach(d => box.innerHTML += `<div><span style="color:#555">></span> ${d.data().text}</div>`);
+            box.scrollTop = box.scrollHeight;
+        });
 
-            if(!name || !file) return alert("Iltimos, nom va rasm tanlang!");
-
-            btn.innerText = "YUKLANMOQDA...";
-            btn.disabled = true;
+        // --- POSTS & ITEM CHAT ---
+        const postRef = collection(db, "posts");
+        document.getElementById('p-save').onclick = async () => {
+            const name = document.getElementById('p-name').value;
+            const file = document.getElementById('p-file').files[0];
+            const desc = document.getElementById('p-desc').value;
+            if(!name || !file) return alert("Nom va rasm tanlang!");
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                try {
-                    await addDoc(colRef, {
-                        name: name,
-                        bio: bio,
-                        img: e.target.result,
-                        createdAt: Date.now()
-                    });
-                    document.getElementById('modal').style.display = 'none';
-                    document.getElementById('name').value = "";
-                    document.getElementById('bio').value = "";
-                    btn.innerText = "POST QILISH";
-                    btn.disabled = false;
-                } catch (err) {
-                    alert("Xato yuz berdi: " + err.message);
-                    btn.innerText = "POST QILISH";
-                    btn.disabled = false;
-                }
+                await addDoc(postRef, { name, desc, img: e.target.result, time: serverTimestamp() });
+                document.getElementById('modal').style.display='none';
             };
             reader.readAsDataURL(file);
-        });
+        };
 
-        // Ma'lumotlarni real-vaqtda chiqarish
-        const q = query(colRef, orderBy("createdAt", "desc"));
-        onSnapshot(q, (snap) => {
-            const cont = document.getElementById('posts-container');
+        onSnapshot(query(postRef, orderBy("time", "desc")), (snap) => {
+            const cont = document.getElementById('container');
+            const search = document.getElementById('search').value.toLowerCase();
             cont.innerHTML = "";
-            snap.forEach(doc => {
-                const d = doc.data();
-                cont.innerHTML += `
-                    <div class="card">
-                        <img src="${d.img}">
-                        <h3 style="margin:5px 0;">${d.name}</h3>
-                        <p style="font-size:12px; color:#aaa;">${d.bio}</p>
-                    </div>`;
+            snap.forEach(d => {
+                const p = d.data();
+                if(p.name.toLowerCase().includes(search)) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <button class="del-btn" onclick="window.deletePost('${d.id}')">X</button>
+                        <img src="${p.img}">
+                        <div class="card-info">
+                            <h4 style="margin:0">${p.name}</h4>
+                            <p style="font-size:12px; color:#888; margin:5px 0;">${p.desc}</p>
+                        </div>
+                        <div class="item-chat">
+                            <div class="msg-list" id="msg-${d.id}"></div>
+                            <div class="msg-input">
+                                <input type="text" placeholder="Savol berish..." onkeydown="if(event.key==='Enter') window.sendPrivate('${d.id}', this.value); if(event.key==='Enter') this.value='';">
+                            </div>
+                        </div>
+                    `;
+                    cont.appendChild(card);
+                    listenToPrivate(d.id);
+                }
             });
         });
+
+        window.deletePost = async (id) => { if(confirm("O'chirilsinmi?")) await deleteDoc(doc(db, "posts", id)); };
+
+        window.sendPrivate = async (postId, text) => {
+            if(!text) return;
+            await addDoc(collection(db, `posts/${postId}/messages`), { text, time: serverTimestamp() });
+        };
+
+        function listenToPrivate(postId) {
+            onSnapshot(query(collection(db, `posts/${postId}/messages`), orderBy("time", "asc")), (snap) => {
+                const list = document.getElementById(`msg-${postId}`);
+                if(list) {
+                    list.innerHTML = "";
+                    snap.forEach(m => list.innerHTML += `<div>• ${m.data().text}</div>`);
+                    list.scrollTop = list.scrollHeight;
+                }
+            });
+        }
+
+        document.getElementById('search').oninput = () => { /* triggers refresh */ };
     </script>
 </body>
 </html>
