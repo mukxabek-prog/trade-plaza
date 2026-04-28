@@ -3,80 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma Plaza - Private Chat System</title>
+    <title>Sigma Plaza - Professional Edition</title>
     <style>
-        :root { --main: #0f0; --bg: #000; --card: #0a0a0a; }
-        body { margin: 0; background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar Global Chat */
-        .sidebar { width: 280px; border-right: 2px solid var(--main); display: flex; flex-direction: column; background: #050505; }
-        .chat-header { padding: 15px; border-bottom: 1px solid var(--main); text-align: center; font-size: 14px; font-weight: bold; }
-        #global-messages { flex: 1; overflow-y: auto; padding: 10px; font-size: 12px; }
-        .input-box { display: flex; border-top: 1px solid var(--main); padding: 5px; }
-        .input-box input { flex: 1; background: #000; border: none; color: var(--main); padding: 8px; outline: none; }
+        :root { --neon: #0f0; --dark: #050505; --sidebar-w: 80px; }
+        body { margin: 0; background: #000; color: var(--neon); font-family: 'Courier New', monospace; display: flex; height: 100vh; overflow: hidden; }
 
-        /* Main Area */
-        .main-layout { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .header { padding: 10px 20px; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; }
-        .search-bar { background: #000; border: 1px solid var(--main); color: var(--main); padding: 5px 15px; border-radius: 5px; width: 250px; }
-        
-        .container { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-        
-        /* Item Card */
-        .card { border: 1px solid #333; border-radius: 10px; background: var(--card); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .card:hover { border-color: var(--main); }
-        .card img { width: 100%; height: 150px; object-fit: cover; }
-        .card-info { padding: 10px; flex: 1; }
-        .del-btn { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; cursor: pointer; padding: 2px 7px; border-radius: 3px; font-size: 10px; }
+        /* SIDEBAR (Rasmga o'xshash) */
+        .sidebar { width: var(--sidebar-w); background: var(--dark); border-right: 2px solid var(--neon); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; z-index: 100; }
+        .nav-item { cursor: pointer; text-align: center; font-size: 10px; transition: 0.3s; width: 100%; padding: 10px 0; }
+        .nav-item:hover { background: rgba(0, 255, 0, 0.1); }
+        .nav-item img { width: 35px; filter: invert(1); margin-bottom: 5px; }
 
-        /* Mini Chat inside Card */
-        .item-chat { height: 120px; border-top: 1px solid #222; background: #050505; display: flex; flex-direction: column; }
-        .msg-list { flex: 1; overflow-y: auto; padding: 5px; font-size: 11px; color: #aaa; }
-        .msg-input { border-top: 1px solid #222; display: flex; }
-        .msg-input input { flex: 1; background: transparent; border: none; color: var(--main); padding: 5px; font-size: 11px; outline: none; }
+        /* MAIN CONTENT AREA */
+        .content-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .header { padding: 10px 25px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; align-items: center; background: var(--dark); }
+        .section { display: none; flex: 1; overflow-y: auto; padding: 20px; }
+        .section.active { display: block; }
 
-        /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: #000; border: 2px solid var(--main); padding: 20px; width: 300px; border-radius: 10px; }
-        .add-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--main); border-radius: 50%; border: none; font-size: 30px; cursor: pointer; color: black; font-weight: bold; }
+        /* GOOGLE USER INFO */
+        #user-info { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        #user-img { width: 30px; border-radius: 50%; border: 1px solid var(--neon); }
+
+        /* POST CARDS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: var(--dark); border: 1px solid #333; border-radius: 12px; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 160px; object-fit: cover; }
+        .card-body { padding: 12px; }
+
+        /* CHAT STYLES */
+        .chat-box { display: flex; flex-direction: column; height: 80%; border: 1px solid var(--neon); background: var(--dark); }
+        #chat-msgs, #admin-msgs { flex: 1; overflow-y: auto; padding: 15px; font-size: 13px; }
+        .chat-input { display: flex; border-top: 1px solid var(--neon); }
+        .chat-input input { flex: 1; background: #000; border: none; color: var(--neon); padding: 12px; outline: none; }
+
+        /* BUTTONS */
+        .add-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--neon); border: none; border-radius: 50%; font-size: 35px; cursor: pointer; color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="chat-header">GLOBAL CHAT</div>
-        <div id="global-messages"></div>
-        <div class="input-box">
-            <input type="text" id="g-input" placeholder="Xabar...">
-            <button id="g-send" style="background:var(--main); border:none; cursor:pointer; padding: 5px 10px;">></button>
-        </div>
+        <div class="nav-item" onclick="showSection('brainrots')">🏠<br>Brainrot</div>
+        <div class="nav-item" onclick="showSection('chat')">💬<br>Global</div>
+        <div class="nav-item" onclick="showSection('shop')">🛒<br>Shop</div>
+        <div class="nav-item" onclick="showSection('admin')">👑<br>Admin</div>
     </div>
 
-    <div class="main-layout">
+    <div class="content-area">
         <div class="header">
-            <h3>SIGMA PLAZA</h3>
-            <input type="text" id="search" class="search-bar" placeholder="Qidirish...">
-            <button onclick="location.href='index.html'" style="background:red; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:5px;">Chiqish</button>
+            <h2 id="section-title">BRAINROTLAR QIDIRISH</h2>
+            <div id="user-info">
+                <span id="user-name">Yuklanmoqda...</span>
+                <img id="user-img" src="" alt="">
+                <button onclick="logout()" style="background:red; color:#fff; border:none; padding:5px; cursor:pointer;">X</button>
+            </div>
         </div>
-        <div id="container" class="container"></div>
+
+        <div id="brainrots" class="section active">
+            <input type="text" id="search" placeholder="Brainrot qidirish..." style="width:100%; background:#111; border:1px solid var(--neon); color:#0f0; padding:10px; margin-bottom:20px;">
+            <div id="posts-grid" class="grid"></div>
+        </div>
+
+        <div id="chat" class="section">
+            <div class="chat-box">
+                <div id="chat-msgs"></div>
+                <div class="chat-input">
+                    <input type="text" id="g-input" placeholder="Xabar yozing...">
+                    <button onclick="sendGlobal()" style="background:var(--neon); border:none; width:50px;">></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="shop" class="section">
+            <h2 style="text-align:center;">TEZ KUNDA...</h2>
+            <p style="text-align:center; color:#888;">Shop tizimi ishlab chiqilmoqda.</p>
+        </div>
+
+        <div id="admin" class="section">
+            <div class="chat-box">
+                <div id="admin-msgs"></div>
+                <div class="chat-input">
+                    <input type="text" id="a-input" placeholder="Adminga yozing (Trade yordami)...">
+                    <button onclick="sendAdmin()" style="background:var(--neon); border:none; width:50px;">></button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <button class="add-btn" onclick="document.getElementById('modal').style.display='flex'">+</button>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0">Yangi Post</h3>
-            <input type="text" id="p-name" placeholder="Buyum nomi" style="width:100%; margin-bottom:10px;">
-            <input type="file" id="p-file" accept="image/*" style="width:100%; margin-bottom:10px;">
-            <textarea id="p-desc" placeholder="Tavsif (narxi va h.k.)" style="width:100%; height:60px; margin-bottom:10px; background:#111; color:#0f0; border:1px solid #0f0;"></textarea>
-            <button id="p-save" style="width:100%; padding:10px; background:var(--main); border:none; font-weight:bold; cursor:pointer;">POST QILISH</button>
-            <p onclick="document.getElementById('modal').style.display='none'" style="text-align:center; color:red; cursor:pointer; margin-top:10px;">Yopish</p>
-        </div>
-    </div>
+    <button class="add-btn" id="openModal">+</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAOfHOeEY_z5_UIZ3iX37-ghsn3GPCCcaw",
@@ -88,88 +107,88 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+
+        // --- LOGIN TIZIMI ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-name').innerText = user.displayName;
+                document.getElementById('user-img').src = user.photoURL;
+            } else {
+                signInWithPopup(auth, provider);
+            }
+        });
+
+        window.logout = () => signOut(auth);
+
+        // --- NAVIGATION ---
+        window.showSection = (id) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('section-title').innerText = id.toUpperCase();
+        };
 
         // --- GLOBAL CHAT ---
-        const gChatRef = collection(db, "global_chat");
-        document.getElementById('g-send').onclick = async () => {
+        window.sendGlobal = async () => {
             const txt = document.getElementById('g-input').value;
-            if(txt) {
-                await addDoc(gChatRef, { text: txt, time: serverTimestamp() });
+            if(txt && currentUser) {
+                await addDoc(collection(db, "global_msgs"), {
+                    user: currentUser.displayName,
+                    text: txt,
+                    time: serverTimestamp()
+                });
                 document.getElementById('g-input').value = "";
             }
         };
-        onSnapshot(query(gChatRef, orderBy("time", "asc")), (snap) => {
-            const box = document.getElementById('global-messages');
+
+        onSnapshot(query(collection(db, "global_msgs"), orderBy("time", "asc")), (snap) => {
+            const box = document.getElementById('chat-msgs');
             box.innerHTML = "";
-            snap.forEach(d => box.innerHTML += `<div><span style="color:#555">></span> ${d.data().text}</div>`);
+            snap.forEach(d => box.innerHTML += `<div><b>${d.data().user}:</b> ${d.data().text}</div>`);
             box.scrollTop = box.scrollHeight;
         });
 
-        // --- POSTS & ITEM CHAT ---
-        const postRef = collection(db, "posts");
-        document.getElementById('p-save').onclick = async () => {
-            const name = document.getElementById('p-name').value;
-            const file = document.getElementById('p-file').files[0];
-            const desc = document.getElementById('p-desc').value;
-            if(!name || !file) return alert("Nom va rasm tanlang!");
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                await addDoc(postRef, { name, desc, img: e.target.result, time: serverTimestamp() });
-                document.getElementById('modal').style.display='none';
-            };
-            reader.readAsDataURL(file);
+        // --- ADMIN CHAT ---
+        window.sendAdmin = async () => {
+            const txt = document.getElementById('a-input').value;
+            if(txt && currentUser) {
+                await addDoc(collection(db, "admin_help"), {
+                    user: currentUser.displayName,
+                    text: txt,
+                    time: serverTimestamp()
+                });
+                document.getElementById('a-input').value = "";
+            }
         };
 
-        onSnapshot(query(postRef, orderBy("time", "desc")), (snap) => {
-            const cont = document.getElementById('container');
-            const search = document.getElementById('search').value.toLowerCase();
-            cont.innerHTML = "";
-            snap.forEach(d => {
-                const p = d.data();
-                if(p.name.toLowerCase().includes(search)) {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <button class="del-btn" onclick="window.deletePost('${d.id}')">X</button>
-                        <img src="${p.img}">
-                        <div class="card-info">
-                            <h4 style="margin:0">${p.name}</h4>
-                            <p style="font-size:12px; color:#888; margin:5px 0;">${p.desc}</p>
-                        </div>
-                        <div class="item-chat">
-                            <div class="msg-list" id="msg-${d.id}"></div>
-                            <div class="msg-input">
-                                <input type="text" placeholder="Savol berish..." onkeydown="if(event.key==='Enter') window.sendPrivate('${d.id}', this.value); if(event.key==='Enter') this.value='';">
-                            </div>
-                        </div>
-                    `;
-                    cont.appendChild(card);
-                    listenToPrivate(d.id);
-                }
-            });
+        onSnapshot(query(collection(db, "admin_help"), orderBy("time", "asc")), (snap) => {
+            const box = document.getElementById('admin-msgs');
+            box.innerHTML = "";
+            snap.forEach(d => box.innerHTML += `<div><b>${d.data().user}:</b> ${d.data().text}</div>`);
+            box.scrollTop = box.scrollHeight;
         });
 
-        window.deletePost = async (id) => { if(confirm("O'chirilsinmi?")) await deleteDoc(doc(db, "posts", id)); };
-
-        window.sendPrivate = async (postId, text) => {
-            if(!text) return;
-            await addDoc(collection(db, `posts/${postId}/messages`), { text, time: serverTimestamp() });
-        };
-
-        function listenToPrivate(postId) {
-            onSnapshot(query(collection(db, `posts/${postId}/messages`), orderBy("time", "asc")), (snap) => {
-                const list = document.getElementById(`msg-${postId}`);
-                if(list) {
-                    list.innerHTML = "";
-                    snap.forEach(m => list.innerHTML += `<div>• ${m.data().text}</div>`);
-                    list.scrollTop = list.scrollHeight;
-                }
+        // --- POSTLARNI CHIQARISH ---
+        onSnapshot(query(collection(db, "posts"), orderBy("time", "desc")), (snap) => {
+            const grid = document.getElementById('posts-grid');
+            grid.innerHTML = "";
+            snap.forEach(d => {
+                const p = d.data();
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}">
+                        <div class="card-body">
+                            <h4>${p.name}</h4>
+                            <p>${p.desc || ''}</p>
+                        </div>
+                    </div>`;
             });
-        }
-
-        document.getElementById('search').oninput = () => { /* triggers refresh */ };
+        });
     </script>
 </body>
 </html>
