@@ -274,7 +274,7 @@
             if(adminSub) adminSub();
             adminSub = onSnapshot(query(collection(db, "admin_messages", path, "list"), orderBy("time", "asc")), (s) => {
                 const b = document.getElementById('a-msgs'); b.innerHTML = "";
-                s.forEach(d => { const m = d.data(); const c = m.sender === ADMIN_EMAIL ? 'red' : 'var(--neon)'; b.innerHTML += `<div><b style="color:${c}">${m.name}:</b> ${m.text}</div>`; });
+                s.forEach(d => { const m = d.data(); const c = m.sender === mukxabek@gmail.com ? 'red' : 'var(--neon)'; b.innerHTML += `<div><b style="color:${c}">${m.name}:</b> ${m.text}</div>`; });
                 b.scrollTop = b.scrollHeight;
             });
         }
