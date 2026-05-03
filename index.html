@@ -3,110 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirish Sahifasi</title>
+    <!-- Google buni ko'rishi uchun sarlavha -->
+    <title>Sokin Milliy Oshxonasi - Rasmiy sayt</title>
+    
+    <meta name="description" content="Sokin Milliy Oshxonasi - Mazali milliy taomlar va buyurtma berish tizimi.">
+    
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #0b0b0b;
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-        }
-        .box {
-            text-align: center;
-            border: 1px solid #333;
-            padding: 40px;
-            border-radius: 20px;
-            background: #111;
-            width: 320px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-        }
-        h1 { margin-bottom: 25px; font-size: 24px; }
-        input {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid #444;
-            background: #222;
-            color: white;
-            outline: none;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0 5px 0;
-            border-radius: 30px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .login-btn { background-color: white; color: black; }
-        .reg-btn { background-color: transparent; color: white; border: 2px solid white; }
-        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
-        .hidden { display: none; }
-        .back-link { display: inline-block; margin-top: 15px; color: #888; cursor: pointer; font-size: 14px; }
+        /* Telegram uslubidagi dizayn */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 320px; }
+        img { width: 80px; margin-bottom: 15px; }
+        h2 { margin-bottom: 10px; font-size: 22px; color: #222; }
+        p { color: #707579; font-size: 14px; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #dadce0; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
+        .btn { background-color: #3390ec; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background-color: #2b78c7; }
     </style>
 </head>
 <body>
 
-    <div id="main-page" class="box">
-        <h1>ROBLOX TRADE</h1>
-        <p style="color: #666;">Davom etish uchun tizimga kiring</p>
-        <button class="btn login-btn" onclick="showForm('login-form')">KIRISH</button>
-        <button class="btn reg-btn" onclick="showForm('reg-form')">REGISTRATSIYA</button>
-    </div>
+<div class="login-card">
+    <!-- Bu yerga logotip qo'yishingiz mumkin -->
+    <h2>Sokin Milliy Oshxonasi</h2>
+    <p>Telefon raqamingizni kiriting</p>
+    
+    <input type="tel" id="phone" placeholder="+998 00 000 00 00" value="+998">
+    <button class="btn" onclick="sendCode()">KEYINGISI</button>
+</div>
 
-    <div id="reg-form" class="box hidden">
-        <h1>REGISTRATSIYA</h1>
-        <input type="email" id="reg-email" placeholder="Emailingiz">
-        <input type="password" id="reg-pass" placeholder="Parol yarating">
-        <button class="btn login-btn" onclick="saveData()">SAQLASH</button>
-        <div class="back-link" onclick="showForm('main-page')">Orqaga qaytish</div>
-    </div>
-
-    <div id="login-form" class="box hidden">
-        <h1>KIRISH</h1>
-        <input type="email" id="login-email" placeholder="Email">
-        <input type="password" id="login-pass" placeholder="Parol">
-        <button class="btn login-btn" onclick="checkData()">KIRISH</button>
-        <div class="back-link" onclick="showForm('main-page')">Orqaga qaytish</div>
-    </div>
-
-    <script>
-        function showForm(formId) {
-            document.getElementById('main-page').classList.add('hidden');
-            document.getElementById('reg-form').classList.add('hidden');
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById(formId).classList.remove('hidden');
+<script>
+    function sendCode() {
+        let phone = document.getElementById('phone').value;
+        if(phone.length > 9) {
+            // Botga yuborish yoki keyingi sahifaga o'tish logikasi
+            window.location.href = "https://t.me/sokin_sms_bot?start=" + btoa(phone);
+        } else {
+            alert("Raqamni to'liq kiriting!");
         }
+    }
+</script>
 
-        function saveData() {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            if(email.includes("@") && pass.length >= 4) {
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('user_pass', pass);
-                alert("Ro'yxatdan o'tdingiz!");
-                showForm('login-form');
-            } else { alert("Ma'lumotlarni to'g'ri kiriting!"); }
-        }
-
-        function checkData() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            const sEmail = localStorage.getItem('user_email');
-            const sPass = localStorage.getItem('user_pass');
-
-            if(email === sEmail && pass === sPass) {
-                window.location.href = "main.html"; // Muvaffaqiyatli kirsa, main.html ga o'tadi
-            } else { alert("Email yoki parol xato!"); }
-        }
-    </script>
 </body>
 </html>
